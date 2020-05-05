@@ -5,20 +5,22 @@ import android.text.TextUtils
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
+import com.numbertoword.databinding.ActivityMainBinding
 import kotlinx.android.synthetic.main.activity_main.*
 
-class MainActivity : AppCompatActivity(), View.OnClickListener {
+
+class MainActivity : AppCompatActivity(), View.OnClickListener, MainActivityView {
 
     var result: String = ""
+    lateinit var mainActivityPresenter: MainActivityPresenter
+    lateinit var mainBinding : ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        init()
-    }
-
-    private fun init() {
-        txt_convert.setOnClickListener(this)
+        mainBinding = DataBindingUtil.setContentView(this, R.layout.activity_main)
+        mainBinding.activity = this
+        mainActivityPresenter = MainActivityPresenter(this)
     }
 
     override fun onClick(view: View?) {
@@ -36,10 +38,7 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
                         } else {
                             if (input.equals("0").not()) {
                                 var parseInt = input.toInt();
-                                var numberUtils = NumberUtils()
-                                txt_result.text =
-                                    (input + " : " + numberUtils.convertNumberToWords(parseInt));
-                                et_input.text.clear()
+                                mainActivityPresenter.getNumberToWord(parseInt)
                             } else {
                                 showToast(getString(R.string.enter_greater_than_zero))
                             }
@@ -53,8 +52,21 @@ class MainActivity : AppCompatActivity(), View.OnClickListener {
         }
     }
 
-    fun showToast(msg: String) {
+    private fun showToast(msg: String) {
         Toast.makeText(applicationContext, msg, Toast.LENGTH_LONG).show()
+    }
+
+    override fun onSuccess(numberToWord: Int, convertNumberToWords: String?) {
+        try {
+            val result = buildString {
+                append(numberToWord).append(getString(R.string.colon))
+                    .append(convertNumberToWords)
+            }
+            txt_result.text = result
+            et_input.text.clear()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 }
 

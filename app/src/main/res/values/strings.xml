@@ -3,4 +3,5 @@
     <string name="enter_number">Please enter number</string>
     <string name="supported_length">Length more than 6 is not supported</string>
     <string name="enter_greater_than_zero">Please enter number greater than zero.</string>
+    <string name="colon"> : </string>
 </resources>
